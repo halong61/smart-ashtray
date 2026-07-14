@@ -113,12 +113,5 @@ npm run dev
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
 
-## 포트폴리오에서 강조하고 싶은 포인트
-- 사용자 관점의 대시보드/관리 화면을 실제 서비스처럼 구성한 경험
-- 프론트엔드, 백엔드, 모바일 클라이언트를 하나의 제품 흐름으로 연결한 경험
-- IoT 환경에서 API와 UI가 어떻게 연결되는지 보여줄 수 있는 구조
-- AI 도구를 활용해 빠르게 프로토타입을 만들고, 반복적으로 개선한 경험
-
 ## 참고 문서
 - [ACCEPTANCE_KOREAN.md](ACCEPTANCE_KOREAN.md)
-- [ui-guidelines.md](ui-guidelines.md)
