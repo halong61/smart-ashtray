@@ -52,11 +52,7 @@ $ flutter run
 <br/>
 <br/>
 
-# 4. Team Members (팀원 및 팀 소개)
-| 찬 |
-|:------:|
-| PM / IoT / Backend / Frontend / App |
-| [GitHub](https://github.com/) |
+# 4. Team Members
 
 <br/>
 <br/>
