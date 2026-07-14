@@ -1,0 +1,14 @@
+.env
+mosquitto/data/
+mosquitto/log/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+frontend/dist/
+frontend/node_modules/
+flutter_app/build/
+flutter_app/.dart_tool/
+*.log
+.DS_Store

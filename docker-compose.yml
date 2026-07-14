@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: smart-ashtray-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+    networks:
+      - ashtray-network
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: smart-ashtray-timescaledb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ashtray_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-ashtray_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ashtray_user} -d ${POSTGRES_DB:-ashtray_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ashtray-network
+
+  backend:
+    build: ./backend
+    container_name: smart-ashtray-backend
+    env_file:
+      - .env
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - ashtray-network
+
+  frontend:
+    build: ./frontend
+    container_name: smart-ashtray-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    networks:
+      - ashtray-network
+
+networks:
+  ashtray-network:
+    driver: bridge
+
+volumes:
+  timescale_data:
