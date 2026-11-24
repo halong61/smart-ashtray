@@ -1,14 +1,35 @@
+# 인증서 키 (절대 커밋 금지)
+*.key
+*.pem
+*.srl
+*.csr
+
+# 서버 비밀 파일 (Firebase 서비스 계정 키 등) — README 만 커밋
+secrets/*
+!secrets/README.md
+
+# 환경변수
 .env
-mosquitto/data/
-mosquitto/log/
-node_modules/
-__pycache__/
-*.pyc
-*.pyo
-.pytest_cache/
+.env.*
+!.env.example
+
+# 빌드 결과물
 frontend/dist/
 frontend/node_modules/
-flutter_app/build/
-flutter_app/.dart_tool/
-*.log
-.DS_Store
+mobile/build/
+mobile/.dart_tool/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.pio/
+
+# 런타임 데이터
+mosquitto/data/
+mosquitto/log/
+certbot/
+data/
+
+# IDE
+.vscode/settings.json
+.idea/
