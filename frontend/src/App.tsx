@@ -1,48 +1,78 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import DashboardPage from './pages/DashboardPage';
-import BoothManagementPage from './pages/BoothManagementPage';
+import type { ReactNode } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Layout } from "./components/Layout";
+import { Spinner } from "./components/ui";
+import { useAuth } from "./hooks/useAuth";
+import { LoginPage, RegisterPage, ResetPasswordPage } from "./pages/auth/AuthPages";
+import { DeviceDetailPage } from "./pages/DeviceDetailPage";
+import { DeviceSetupPage } from "./pages/DeviceSetupPage";
+import { HistoryPage } from "./pages/HistoryPage";
+import { HomePage } from "./pages/HomePage";
+import { InquiryDetailPage, InquiryListPage, InquiryNewPage } from "./pages/InquiryPage";
+import { NotificationsPage } from "./pages/NotificationsPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { AdminCapabilities, AdminDeviceTypes, AdminFirmware, AdminNotificationRules } from "./pages/admin/AdminConfigPages";
+import { AdminLayout } from "./pages/admin/AdminLayout";
+import {
+  AdminDashboard, AdminDevices, AdminInquiryDetail, AdminInquiryList, AdminLogs, AdminUsers,
+} from "./pages/admin/AdminPages";
 
-type BoothStatus = 'IDLE' | 'SMOKING' | 'WARNING' | 'FIRE_DETECTED';
-type SprayMode = 'AUTO' | 'OFF';
+import { ADMIN_ROUTES_ENABLED, IS_ADMIN_HOST } from "./hostMode";
 
-type Booth = {
-  id: string;
-  name: string;
-  floor: string;
-  location: string;
-  status: BoothStatus;
-  aqi: number;
-  cigarettePct: number;
-  waterPct: number;
-  sprayMode: SprayMode;
-  lastSprayAt: string | null;
-  sprayCount: number;
-};
-
-const initialBooths: Booth[] = [
-  { id: 'B-001', name: '휴게실', floor: '2F', location: '휴게실 중앙', status: 'WARNING', aqi: 88, cigarettePct: 81, waterPct: 34, sprayMode: 'AUTO', lastSprayAt: '12:40', sprayCount: 3 },
-  { id: 'B-002', name: '출입구', floor: '1F', location: '정문 입구', status: 'IDLE', aqi: 42, cigarettePct: 24, waterPct: 72, sprayMode: 'OFF', lastSprayAt: '09:12', sprayCount: 1 },
-  { id: 'B-003', name: '회의실', floor: '3F', location: '회의실 복도', status: 'SMOKING', aqi: 118, cigarettePct: 92, waterPct: 21, sprayMode: 'AUTO', lastSprayAt: '13:05', sprayCount: 5 },
-];
-
-function App() {
-  const [token, setToken] = useState<string | null>(null);
-  const [booths, setBooths] = useState<Booth[]>(initialBooths);
-
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage onLoginSuccess={setToken} />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/dashboard" element={token ? <DashboardPage booths={booths} onLogout={() => setToken(null)} /> : <Navigate to="/login" replace />} />
-        <Route path="/booths" element={token ? <BoothManagementPage booths={booths} setBooths={setBooths} /> : <Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
+function RequireAuth({ children, admin = false }: { children: ReactNode; admin?: boolean }) {
+  const { user, loading } = useAuth();
+  const loc = useLocation();
+  if (loading) return <Spinner />;
+  if (!user) return <Navigate to="/login" replace state={{ from: loc.pathname }} />;
+  if (admin && user.role !== "admin") return <p className="p-10 text-center text-red-600">관리자 권한이 필요합니다.</p>;
+  return <>{children}</>;
 }
 
-export default App;
+function PublicOnly({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return <Spinner />;
+  const from = (useLocation().state as { from?: string } | null)?.from;
+  return user ? <Navigate to={from ?? (IS_ADMIN_HOST ? "/admin" : "/")} replace /> : <>{children}</>;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
+      <Route path="/register" element={<PublicOnly><RegisterPage /></PublicOnly>} />
+      <Route path="/reset-password" element={<PublicOnly><ResetPasswordPage /></PublicOnly>} />
+
+      {ADMIN_ROUTES_ENABLED && (
+        <Route path="/admin" element={<RequireAuth admin><AdminLayout /></RequireAuth>}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="devices" element={<AdminDevices />} />
+          <Route path="device-types" element={<AdminDeviceTypes />} />
+          <Route path="capabilities" element={<AdminCapabilities />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="inquiry" element={<AdminInquiryList />} />
+          <Route path="inquiry/:id" element={<AdminInquiryDetail />} />
+          <Route path="notifications" element={<AdminNotificationRules />} />
+          <Route path="firmware" element={<AdminFirmware />} />
+          <Route path="logs" element={<AdminLogs />} />
+        </Route>
+      )}
+
+      {IS_ADMIN_HOST ? (
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      ) : (
+        <Route element={<RequireAuth><Layout /></RequireAuth>}>
+          <Route index element={<HomePage />} />
+          <Route path="devices/setup" element={<DeviceSetupPage />} />
+          <Route path="devices/:id" element={<DeviceDetailPage />} />
+          <Route path="devices/:id/history" element={<HistoryPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
+          <Route path="inquiry" element={<InquiryListPage />} />
+          <Route path="inquiry/new" element={<InquiryNewPage />} />
+          <Route path="inquiry/:id" element={<InquiryDetailPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      )}
+    </Routes>
+  );
+}

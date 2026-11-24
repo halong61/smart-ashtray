@@ -1,15 +1,27 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
+// 개발: /api → FastAPI(localhost:8000) 프록시 (쿠키 same-origin 처리)
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+          charts: ["recharts"],
+          editor: ["@tiptap/react", "@tiptap/starter-kit"],
+        },
+      },
+    },
+  },
   server: {
-    host: '0.0.0.0',
-    port: 3000,
     proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:8000',
+      "/api": {
+        target: "http://localhost:8000",
         changeOrigin: true,
+        ws: true,
+        rewrite: (p) => p.replace(/^\/api/, ""),
       },
     },
   },
