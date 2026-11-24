@@ -33,3 +33,6 @@ data/
 # IDE
 .vscode/settings.json
 .idea/
+
+# 참고용 원본 저장소 clone (각자 .git 보유)
+firmware/_reference/
