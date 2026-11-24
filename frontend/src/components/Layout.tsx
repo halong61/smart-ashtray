@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { ADMIN_ROUTES_ENABLED } from "../hostMode";
 import { cx } from "./ui";
 
 const NAV = [
@@ -25,6 +26,11 @@ export function Layout() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm text-slate-500">
+            {user?.role === "admin" && ADMIN_ROUTES_ENABLED && (
+              <NavLink to="/admin" className="rounded-lg bg-slate-900 px-3 py-1.5 font-medium text-white hover:bg-slate-700">
+                ⚙️ 관리자
+              </NavLink>
+            )}
             <span className="hidden sm:inline">{user?.email}</span>
             <button onClick={logout} className="rounded-lg px-3 py-1.5 hover:bg-slate-100">로그아웃</button>
           </div>

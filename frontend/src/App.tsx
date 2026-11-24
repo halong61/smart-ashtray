@@ -17,9 +17,7 @@ import {
   AdminDashboard, AdminDevices, AdminInquiryDetail, AdminInquiryList, AdminLogs, AdminUsers,
 } from "./pages/admin/AdminPages";
 
-// 같은 빌드를 www / admin 서브도메인에서 서빙 — 관리자 라우트는 admin 호스트(또는 로컬 개발)에서만 노출
-const IS_ADMIN_HOST = location.hostname.startsWith("admin.");
-const ADMIN_ROUTES_ENABLED = IS_ADMIN_HOST || ["localhost", "127.0.0.1"].includes(location.hostname);
+import { ADMIN_ROUTES_ENABLED, IS_ADMIN_HOST } from "./hostMode";
 
 function RequireAuth({ children, admin = false }: { children: ReactNode; admin?: boolean }) {
   const { user, loading } = useAuth();
@@ -33,7 +31,8 @@ function RequireAuth({ children, admin = false }: { children: ReactNode; admin?:
 function PublicOnly({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <Spinner />;
-  return user ? <Navigate to={IS_ADMIN_HOST ? "/admin" : "/"} replace /> : <>{children}</>;
+  const from = (useLocation().state as { from?: string } | null)?.from;
+  return user ? <Navigate to={from ?? (IS_ADMIN_HOST ? "/admin" : "/")} replace /> : <>{children}</>;
 }
 
 export default function App() {

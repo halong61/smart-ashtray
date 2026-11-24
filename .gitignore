@@ -12,6 +12,7 @@ secrets/*
 .env
 .env.*
 !.env.example
+!frontend/.env.mock
 
 # 빌드 결과물
 frontend/dist/
@@ -36,3 +37,6 @@ data/
 
 # 참고용 원본 저장소 clone (각자 .git 보유)
 firmware/_reference/
+
+# TypeScript 증분 빌드 캐시
+*.tsbuildinfo

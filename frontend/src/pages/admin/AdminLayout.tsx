@@ -1,3 +1,4 @@
+import { IS_ADMIN_HOST } from "../../hostMode";
 import { NavLink, Outlet } from "react-router-dom";
 import { cx } from "../../components/ui";
 import { useAuth } from "../../hooks/useAuth";
@@ -29,7 +30,8 @@ export function AdminLayout() {
           ))}
         </nav>
         <div className="mt-6 border-t border-slate-700 px-5 py-4 text-xs">
-          <p className="truncate">{user?.email}</p>
+          <p className="truncate">{user?.email} <span className="text-slate-500">(관리자)</span></p>
+          {!IS_ADMIN_HOST && <NavLink to="/" className="mt-2 block text-slate-400 hover:text-white">← 사용자 화면</NavLink>}
           <button onClick={logout} className="mt-2 text-slate-400 hover:text-white">로그아웃</button>
         </div>
       </aside>

@@ -1,5 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 import { Alert, Button, Input } from "../../components/ui";
 import { useAuth } from "../../hooks/useAuth";
@@ -37,12 +37,14 @@ function useSubmit() {
 export function LoginPage() {
   const { login } = useAuth();
   const nav = useNavigate();
+  // RequireAuth 가 넘겨준 원래 경로(예: /admin)로 복귀
+  const from = (useLocation().state as { from?: string } | null)?.from ?? "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { error, busy, wrap } = useSubmit();
   return (
     <Shell title="로그인">
-      <form className="space-y-4" onSubmit={wrap(async () => { await login(email, password); nav("/"); })}>
+      <form className="space-y-4" onSubmit={wrap(async () => { await login(email, password); nav(from, { replace: true }); })}>
         <Input label="이메일" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         <Input label="비밀번호" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         <Alert>{error}</Alert>

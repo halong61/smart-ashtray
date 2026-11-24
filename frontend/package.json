@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:mock": "vite --mode mock"
   },
   "dependencies": {
     "@tiptap/extension-placeholder": "^3.0.0",
