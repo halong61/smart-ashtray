@@ -197,7 +197,8 @@
 | 저장소 | 브랜치 | 내용 |
 |---|---|---|
 | `halong61/smart-ashtray` | `feature/platform` | 통합 플랫폼 모노레포 (1차 업로드) |
-| `yerin040821/smart-clean-ashtray` | `feature/platform` → `develop` **PR** | 통합 플랫폼 모노레포 (본 보고서 포함) |
+| `yerin040821/smart-clean-ashtray` | `feature/platform` → `develop` **PR #1** (리뷰 대기) | 통합 플랫폼 모노레포 (본 보고서 포함) — https://github.com/yerin040821/smart-clean-ashtray/pull/1 |
+| (공통) | `develop` | 2026-11-25 `main` 에서 생성 (PR 대상) |
 
 - 비밀 파일(Firebase 서버 키, `.env`, 인증서 키)은 커밋 대상에서 제외
 - 커밋 컨벤션: `feat` / `fix` / `docs` / `chore` 등 (설계서 15장)
